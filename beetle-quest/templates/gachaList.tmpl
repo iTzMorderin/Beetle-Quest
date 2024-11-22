@@ -1,0 +1,14 @@
+<h2>Gacha List</h2>
+<div class="gacha-list">
+    {{ range .GachaList }}
+    <div class="gacha-item {{ .Rarity }}">
+        <img src="{{ .ImagePath }}" alt="{{ .Name }}" class="gacha-image" />
+        <div class="gacha-info">
+            <h3>{{ .Name }}</h3>
+            <p class="rarity">{{ .Rarity }}</p>
+            <p class="price">Price: {{ .Price }} coins</p>
+            <button class="buy-button" hx-get="/api/v1/market/gacha/{{ .GachaID }}/buy" hx-target="#notification-popup"  hx-target-4xx="#notification-popup" hx-target-5*="#notification-popup" hx-swap="innerHTML">Buy</button>
+        </div>
+    </div>
+    {{ end }}
+</div>

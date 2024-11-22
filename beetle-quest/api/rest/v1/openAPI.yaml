@@ -1,0 +1,982 @@
+openapi: 3.0.0
+info:
+    title: Beetle Quest API
+    version: 0.1.0
+
+servers:
+    - url: https://localhost/api/v1
+
+tags:
+    - name: Auth
+    - name: Static
+    - name: Users
+    - name: Gachas
+    - name: Market
+    - name: Admin
+    # - name: Report
+
+paths:
+    ### AUTH ###
+    /auth/register:
+        post:
+            summary: Register a new user
+            tags: [Auth]
+            requestBody:
+                description: User registration details
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Register"
+            responses:
+                201:
+                    description: user registered successfully.
+                400:
+                    description: Status bad requests.
+                500:
+                    description: internal server error.
+
+    /auth/login:
+        post:
+            summary: Login
+            tags: [Auth]
+            requestBody:
+                description: Login details
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Login"
+            responses:
+                302:
+                    description: Login successfull.
+                    headers:
+                        Set-Cookie:
+                            schema:
+                                type: string
+                400:
+                    description: Status bad request.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /auth/logout:
+        get:
+            summary: Logout
+            tags: [Auth]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - user
+            #           - admin
+            responses:
+                302:
+                    description: Logout successfull.
+                500:
+                    description: Internal server error.
+
+    /auth/check_session:
+        get:
+            summary: Check session
+            tags: [Auth]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - user
+            #           - admin
+            responses:
+                200:
+                    description: Session is valid.
+                404:
+                    description: Status Not found.
+                500:
+                    description: Internal server error.
+
+    /auth/traefik/verify:
+        get:
+            summary: Traefik verify
+            tags: [Auth]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - user
+            #           - admin
+            responses:
+                200:
+                    description: Authorized.
+                302:
+                    description: Status found.
+                500:
+                    description: Internal server error.
+
+    /auth/admin/login:
+        post:
+            summary: Admin login
+            tags: [Auth]
+            requestBody:
+                description: Admin login details
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/AdminLogin"
+            responses:
+                302:
+                    description: Admin login successfull.
+                400:
+                    description: Invalid request data.
+                500:
+                    description: Internal server error.
+
+    ### STATIC ###
+    /static/{path}:
+        get:
+            servers:
+                - url: https://localhost/
+            summary: Get static file
+            tags: [Static]
+            parameters:
+                - name: path
+                  in: path
+                  description: File path.
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: Static file.
+                404:
+                    description: File not found.
+                500:
+                    description: Internal server error.
+
+    ### USERS ###
+    /user/account/{user_id}:
+        get:
+            summary: Get user account
+            tags: [Users]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - user
+            parameters:
+                - name: user_id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: User account details.
+                400:
+                    description: Status bad requests.
+                500:
+                    description: Internal server error.
+        patch:
+            summary: Modify user account
+            tags: [Users]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - user
+            parameters:
+                - name: user_id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                description: User account details
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/PatchUser"
+            responses:
+                200:
+                    description: User account modified successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+        delete:
+            summary: Delete user account
+            tags: [Users]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - user
+            parameters:
+                - name: user_id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                303:
+                    description: Status see other (redirect to login).
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    ### GACHAS ###
+
+    /gacha/list:
+        get:
+            summary: Get system gacha list
+            tags: [Gachas]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - user
+            responses:
+                200:
+                    description: System's gacha list.
+                404:
+                    description: Status bad requests.
+                500:
+                    description: Internal server error.
+
+    /gacha/{gacha_id}:
+        get:
+            summary: Get gacha details
+            tags: [Gachas]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - user
+            parameters:
+                - name: gacha_id
+                  in: path
+                  description: Gacha ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: System's gacha details.
+                404:
+                    description: Status bad requests.
+                500:
+                    description: Internal server error.
+
+    /gacha/user/{user_id}/list:
+        get:
+            summary: Get user gacha list
+            tags: [Gachas]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - user
+            parameters:
+                - name: user_id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: User gacha list.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /gacha/{gacha_id}/user/{user_id}:
+        get:
+            summary: Get user gacha details
+            tags: [Gachas]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - user
+            parameters:
+                - name: gacha_id
+                  in: path
+                  description: Gacha ID
+                  required: true
+                  schema:
+                      type: string
+                - name: user_id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: User gacha details.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    ### MARKET ###
+    /market/bugscoin/buy:
+        post:
+            summary: Buy bugscoin
+            tags: [Market]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - user
+            requestBody:
+                description: Buy bugscoin details
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/BuyBugscoin"
+            responses:
+                200:
+                    description: Bugscoin bought successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /market/gacha/roll:
+        get:
+            summary: Roll gacha
+            tags: [Market]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - user
+            responses:
+                200:
+                    description: Gacha rolled successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /market/gacha/{gacha_id}/buy:
+        get:
+            summary: Buy gacha
+            tags: [Market]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - user
+            parameters:
+                - name: gacha_id
+                  in: path
+                  description: Gacha ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: Gacha bought successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /market/auction:
+        post:
+            summary: Create auction
+            tags: [Market]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - user
+            requestBody:
+                description: Create auction details
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/CreateAuction"
+            responses:
+                200:
+                    description: Auction created successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                409:
+                    description: Status conflict.
+                500:
+                    description: Internal server error.
+
+    /market/auction/list:
+        get:
+            summary: Get auction list
+            tags: [Market]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - user
+            responses:
+                200:
+                    description: Auction list obtained successfully.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /market/auction/{auction_id}:
+        get:
+            summary: Get auction details
+            tags: [Market]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - user
+            parameters:
+                - name: auction_id
+                  in: path
+                  description: Auction ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: Auction deleted successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+        delete:
+            summary: Delete auction
+            tags: [Market]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - user
+            parameters:
+                - name: auction_id
+                  in: path
+                  description: Auction ID
+                  required: true
+                  schema:
+                      type: string
+                - name: password
+                  in: query
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: Auction deleted successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /market/auction/{auction_id}/bid:
+        post:
+            summary: Bid auction
+            tags: [Market]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - user
+            parameters:
+                - name: auction_id
+                  in: path
+                  description: Auction ID
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                description: Bid auction details
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/BidAuction"
+            responses:
+                200:
+                    description: Auction bid successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    ### ADMIN ###
+    /admin/user/get_all:
+        get:
+            summary: Get all users
+            tags: [Admin]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - admin
+            responses:
+                200:
+                    description: All users obtained successfully.
+                500:
+                    description: Internal server error.
+
+    /admin/user/{user_id}:
+        get:
+            summary: Get user details
+            tags: [Admin]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - admin
+            parameters:
+                - name: user_id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: User details obtained successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+        patch:
+            summary: Update user details
+            tags: [Admin]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #     - admin
+            parameters:
+                - name: user_id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                description: Update user details
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/UpdateUser"
+            responses:
+                200:
+                    description: User details updated successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                409:
+                    description: Status conflict.
+                500:
+                    description: Internal server error.
+
+    /admin/user/{user_id}/transaction_history:
+        get:
+            summary: Get user transaction history
+            tags: [Admin]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - admin
+            parameters:
+                - name: user_id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: User transaction history obtained successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /admin/user/{user_id}/auction/get_all:
+        get:
+            summary: Get user auction list
+            tags: [Admin]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - admin
+            parameters:
+                - name: user_id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: User auction list obtained successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /admin/gacha/add:
+        post:
+            summary: Add gacha
+            tags: [Admin]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - admin
+            requestBody:
+                description: Add gacha
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/AddGacha"
+            responses:
+                200:
+                    description: Gacha added successfully.
+                400:
+                    description: Status bad requests.
+                500:
+                    description: Internal server error.
+
+    /admin/gacha/get_all:
+        get:
+            summary: Get all gachas
+            tags: [Admin]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - admin
+            responses:
+                200:
+                    description: All gachas obtained successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /admin/gacha/{gacha_id}:
+        get:
+            summary: Get gacha details
+            tags: [Admin]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - admin
+            parameters:
+                - name: gacha_id
+                  in: path
+                  description: Gacha ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: Gacha details obtained successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+        patch:
+            summary: Update gacha details
+            tags: [Admin]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - admin
+            parameters:
+                - name: gacha_id
+                  in: path
+                  description: Gacha ID
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                description: Update gacha
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/UpdateGacha"
+            responses:
+                200:
+                    description: Gacha details updated successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                409:
+                    description: Status conflict.
+                500:
+                    description: Internal server error.
+        delete:
+            summary: Delete gacha
+            tags: [Admin]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - admin
+            parameters:
+                - name: gacha_id
+                  in: path
+                  description: Gacha ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: Gacha deleted successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /admin/market/transaction_history:
+        get:
+            summary: Get market's transaction history
+            tags: [Admin]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - admin
+            responses:
+                200:
+                    description: Market history obtained successfully.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /admin/market/auction/get_all:
+        get:
+            summary: Get all auctions
+            tags: [Admin]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - admin
+            responses:
+                200:
+                    description: All auctions obtained successfully.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /admin/market/auction/{auction_id}:
+        get:
+            summary: Get auction details
+            tags: [Admin]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - admin
+            parameters:
+                - name: auction_id
+                  in: path
+                  description: Auction ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: Auction details obtained successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+        patch: # TODO
+            summary: Update auction details
+            tags: [Admin]
+            security:
+                - cookieAuth: []
+            #     - oauth2:
+            #           - admin
+            parameters:
+                - name: auction_id
+                  in: path
+                  description: Auction ID
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                description: Update auction
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/UpdateAuction"
+            responses:
+                501:
+                    description: Not implemented yet
+
+components:
+    securitySchemes:
+        cookieAuth:
+            type: apiKey
+            in: cookie
+            name: access_token
+        # oauth2:
+        #     type: oauth2
+        #     flows:
+        #         authorizationCode:
+        #             authorizationUrl: https://localhost/oauth2/authorize
+        #             tokenUrl: https://localhost/oauth2/token
+        #             scopes:
+        #                 user: User scope
+        #                 admin: Admin scope
+
+    schemas:
+        Register:
+            type: object
+            properties:
+                email:
+                    type: string
+                username:
+                    type: string
+                password:
+                    type: string
+
+        Login:
+            type: object
+            properties:
+                username:
+                    type: string
+                password:
+                    type: string
+
+        AdminLogin:
+            type: object
+            properties:
+                admin_id:
+                    type: string
+                password:
+                    type: string
+                otp_code:
+                    type: string
+
+        PatchUser:
+            type: object
+            properties:
+                username:
+                    type: string
+                email:
+                    type: string
+                new_password:
+                    type: string
+                old_password:
+                    type: string
+
+        # Token:
+        #     type: object
+        #     properties:
+        #         grant_type:
+        #             type: string
+        #         client_id:
+        #             type: string
+        #         client_secret:
+        #             type: string
+        #         redirect_uri:
+        #             type: string
+        #         code:
+        #             type: string
+        #         scope:
+        #             type: string
+
+        BuyBugscoin:
+            type: object
+            properties:
+                amount:
+                    type: integer
+
+        CreateAuction:
+            type: object
+            properties:
+                gacha_id:
+                    type: string
+                end_time:
+                    type: string
+
+        BidAuction:
+            type: object
+            properties:
+                bid_amount:
+                    type: string
+
+        UpdateUser:
+            type: object
+            properties:
+                username:
+                    type: string
+                email:
+                    type: string
+                currency:
+                    type: string
+
+        AddGacha:
+            type: object
+            properties:
+                name:
+                    type: string
+                rarity:
+                    type: string
+                price:
+                    type: string
+                image_path:
+                    type: string
+
+        UpdateGacha:
+            type: object
+            properties:
+                name:
+                    type: string
+                rarity:
+                    type: string
+                price:
+                    type: string
+                image_path:
+                    type: string
+
+        UpdateAuction:
+            type: object
+            properties:
+                gacha_id:
+                    type: string
+                end_time:
+                    type: string
