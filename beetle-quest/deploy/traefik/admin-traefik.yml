@@ -1,0 +1,22 @@
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+api:
+  disableDashboardAd: true
+  dashboard: true
+  insecure: true
+  debug: false
+
+# log:
+#   level: "DEBUG"
+
+entryPoints:
+  websec:
+    address: :443
+
+providers:
+  file:
+    filename: "/etc/traefik/admin-rules.yml"
+    watch: true
+    debugLogGeneratedTemplate: true

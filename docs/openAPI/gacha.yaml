@@ -1,0 +1,329 @@
+openapi: 3.0.0
+info:
+    title: Beetle Quest API - Gacha MS API
+    version: 0.1.0
+
+servers:
+    - url: https://gacha-service/api/v1
+
+tags:
+    - name: Gachas
+
+paths:
+    /gacha/list:
+        get:
+            summary: Get system gacha list
+            tags: [Gachas]
+            security:
+                - bearerAuth: []
+            responses:
+                200:
+                    description: System's gacha list.
+                404:
+                    description: Status bad requests.
+                500:
+                    description: Internal server error.
+
+    /gacha/{gacha_id}:
+        get:
+            summary: Get gacha details
+            tags: [Gachas]
+            security:
+                - bearerAuth: []
+            parameters:
+                - name: gacha_id
+                  in: path
+                  description: Gacha ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: System's gacha details.
+                404:
+                    description: Status bad requests.
+                500:
+                    description: Internal server error.
+
+    /gacha/user/{user_id}/list:
+        get:
+            summary: Get user gacha list
+            tags: [Gachas]
+            security:
+                - bearerAuth: []
+            parameters:
+                - name: user_id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: User gacha list.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /gacha/{gacha_id}/user/{user_id}:
+        get:
+            summary: Get user gacha details
+            tags: [Gachas]
+            security:
+                - bearerAuth: []
+            parameters:
+                - name: gacha_id
+                  in: path
+                  description: Gacha ID
+                  required: true
+                  schema:
+                      type: string
+                - name: user_id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: User gacha details.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /internal/gacha/create:
+        post:
+            summary: Create a new gacha
+            tags: [Gachas]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Gacha"
+            responses:
+                200:
+                    description: Gacha created successfully.
+                400:
+                    description: Status bad requests.
+                409:
+                    description: Gacha already exists.
+                500:
+                    description: Internal server error.
+
+    /internal/gacha/update:
+        post:
+            summary: Update a gacha
+            tags: [Gachas]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Gacha"
+            responses:
+                200:
+                    description: Gacha created successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Gacha not found.
+                409:
+                    description: Gacha already exists.
+                500:
+                    description: Internal server error.
+
+    /internal/gacha/delete:
+        post:
+            summary: Delete a gacha
+            tags: [Gachas]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Gacha"
+            responses:
+                200:
+                    description: Gacha created successfully.
+                404:
+                    description: Gacha not found.
+                500:
+                    description: Internal server error.
+
+    /internal/gacha/get_user_gacha:
+        post:
+            summary: Get user gacha
+            tags: [Gachas]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                user_id:
+                                    type: array
+                                    items:
+                                        type: integer
+            responses:
+                200:
+                    description: Status ok.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /internal/gacha/remove_user_gachas:
+        post:
+            summary: Remove user gachas
+            tags: [Gachas]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                user_id:
+                                    type: array
+                                    items:
+                                        type: integer
+            responses:
+                200:
+                    description: Status ok.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /internal/gacha/add_gacha_to_user:
+        post:
+            summary: Add gacha to user
+            tags: [Gachas]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                user_id:
+                                    type: array
+                                    items:
+                                        type: integer
+                                gacha_id:
+                                    type: array
+                                    items:
+                                        type: integer
+            responses:
+                200:
+                    description: Status ok.
+                400:
+                    description: Status bad requests.
+                409:
+                    description: Status conflict.
+                500:
+                    description: Internal server error.
+
+    /internal/gacha/remove_gacha_from_user:
+        post:
+            summary: Remove gacha from user
+            tags: [Gachas]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                user_id:
+                                    type: array
+                                    items:
+                                        type: integer
+                                gacha_id:
+                                    type: array
+                                    items:
+                                        type: integer
+            responses:
+                200:
+                    description: Status ok.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /internal/gacha/find_by_id:
+        post:
+            summary: Remove gacha from user
+            tags: [Gachas]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                gacha_id:
+                                    type: array
+                                    items:
+                                        type: integer
+            responses:
+                200:
+                    description: Status ok.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /internal/gacha/get_all:
+        get:
+            summary: Get all gachas
+            tags: [Gachas]
+            responses:
+                200:
+                    description: Status ok.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+components:
+    securitySchemes:
+        bearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+
+    schemas:
+        Gacha:
+            type: object
+            properties:
+                gacha_id:
+                    type: array
+                    items:
+                        type: integer
+                name:
+                    type: string
+                rarity:
+                    type: integer
+                price:
+                    type: integer
+                image_path:
+                    type: string

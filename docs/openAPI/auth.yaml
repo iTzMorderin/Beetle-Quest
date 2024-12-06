@@ -1,0 +1,263 @@
+openapi: 3.0.0
+info:
+    title: Beetle Quest - Auth MS API
+    version: 0.1.0
+
+servers:
+    - url: https://auth-service/api/v1
+
+tags:
+    - name: OAuth
+    - name: Auth
+
+paths:
+    ### AUTH ###
+    /auth/register:
+        post:
+            summary: Register a new user
+            tags: [Auth]
+            requestBody:
+                description: User registration details
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Register"
+            responses:
+                201:
+                    description: user registered successfully.
+                400:
+                    description: Status bad requests.
+                500:
+                    description: internal server error.
+
+    /auth/login:
+        post:
+            summary: Login
+            tags: [Auth]
+            requestBody:
+                description: Login details
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Login"
+            responses:
+                302:
+                    description: Login successfull.
+                    headers:
+                        Set-Cookie:
+                            schema:
+                                type: string
+                400:
+                    description: Status bad request.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /auth/logout:
+        get:
+            summary: Logout
+            tags: [Auth]
+            security:
+                - bearerAuth: []
+            responses:
+                302:
+                    description: Logout successfull.
+                500:
+                    description: Internal server error.
+
+    /auth/check_session:
+        get:
+            summary: Check session
+            tags: [Auth]
+            security:
+                - bearerAuth: []
+            responses:
+                200:
+                    description: Session is valid.
+                404:
+                    description: Status Not found.
+                500:
+                    description: Internal server error.
+
+    /auth/traefik/verify:
+        get:
+            summary: Traefik verify
+            tags: [Auth]
+            security:
+                - bearerAuth: []
+            responses:
+                200:
+                    description: Authorized.
+                302:
+                    description: Status found.
+                500:
+                    description: Internal server error.
+
+    /auth/admin/login:
+        post:
+            summary: Admin login
+            tags: [Auth]
+            requestBody:
+                description: Admin login details
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/AdminLogin"
+            responses:
+                302:
+                    description: Admin login successfull.
+                400:
+                    description: Invalid request data.
+                500:
+                    description: Internal server error.
+
+    /authPage:
+        get:
+            summary: Get html authentication page
+            tags: [Auth]
+            responses:
+                200:
+                    description: Status ok
+
+    /tokenPage:
+        get:
+            summary: Get html token page
+            tags: [Auth]
+            responses:
+                200:
+                    description: Status ok
+
+    /authorizePage:
+        get:
+            summary: Get html authorization page
+            tags: [Auth]
+            responses:
+                200:
+                    description: Status ok
+                302:
+                    description: Status ok
+                500:
+                    description: Status ok
+
+    ### OAUTH ###
+    /oauth/authorize:
+        get:
+            tags: [OAuth]
+            security:
+                - authSession: []
+            servers:
+                - url: https://auth-service
+            parameters:
+                - name: response_type
+                  in: query
+                  required: true
+                  schema:
+                      type: string
+                      default: code
+                - name: client_id
+                  in: query
+                  required: true
+                  schema:
+                      type: string
+                      default: beetle-quest
+                - name: redirect_uri
+                  in: query
+                  required: true
+                  schema:
+                      type: string
+                      default: "https://localhost/api/v1/auth/tokenPage"
+                - name: state
+                  in: query
+                  required: false
+                  schema:
+                      type: string
+                - name: code_challenge
+                  in: query
+                  required: false
+                  schema:
+                      type: string
+                - name: code_challenge_method
+                  in: query
+                  required: false
+                  schema:
+                      type: string
+                      default: S256
+            responses:
+                200:
+                    description: ok
+
+    /oauth/token:
+        post:
+            tags: [OAuth]
+            servers:
+                - url: https://auth-service
+            requestBody:
+                required: true
+                content:
+                    multipart/form-data:
+                        schema:
+                            $ref: "#/components/schemas/TokenReq"
+            responses:
+                200:
+                    description: ok
+
+components:
+    securitySchemes:
+        authSession:
+            type: apiKey
+            in: cookie
+            name: go_session_id
+        bearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+
+    schemas:
+        TokenReq:
+            type: object
+            properties:
+                grant_type:
+                    type: string
+                    default: authorization_code
+                code:
+                    type: string
+                redirect_uri:
+                    type: string
+                    default: "https://localhost/api/v1/auth/tokenPage"
+                client_id:
+                    type: string
+                    default: beetle-quest
+                code_verifier:
+                    type: string
+
+        Register:
+            type: object
+            properties:
+                email:
+                    type: string
+                username:
+                    type: string
+                password:
+                    type: string
+
+        Login:
+            type: object
+            properties:
+                username:
+                    type: string
+                password:
+                    type: string
+
+        AdminLogin:
+            type: object
+            properties:
+                admin_id:
+                    type: string
+                password:
+                    type: string
+                otp_code:
+                    type: string

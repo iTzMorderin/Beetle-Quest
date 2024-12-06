@@ -1,0 +1,121 @@
+tosca_definitions_version: micro_tosca_yaml_1.1
+description: micro.tosca
+imports:
+- micro: https://di-unipi-socc.github.io/microTOSCA/1.1/microTOSCA.yaml
+topology_template:
+  node_templates:
+    traefik (GATEWAY/LB/CB):
+      type: micro.nodes.MessageRouter
+      requirements:
+      - interaction: user-service
+      - interaction: gacha-service
+      - interaction: market-service
+      - interaction: auth-service
+      - interaction: static-service
+    user-service:
+      type: micro.nodes.Service
+      requirements:
+      - interaction:
+          node: gacha-service
+          relationship: cd
+      - interaction:
+          node: market-service
+          relationship: cd
+      - interaction:
+          node: user-db
+          relationship: td
+    admin-service:
+      type: micro.nodes.Service
+      requirements:
+      - interaction:
+          node: gacha-service
+          relationship: tc
+      - interaction:
+          node: market-service
+          relationship: cd
+      - interaction:
+          node: user-service
+          relationship: cd
+    gacha-service:
+      type: micro.nodes.Service
+      requirements:
+      - interaction:
+          node: gacha-db
+          relationship: td
+    auth-service:
+      type: micro.nodes.Service
+      requirements:
+      - interaction:
+          node: session-db
+          relationship: td
+      - interaction:
+          node: user-service
+          relationship: cd
+      - interaction:
+          node: admin-service
+          relationship: cd
+    market-service:
+      type: micro.nodes.Service
+      requirements:
+      - interaction:
+          node: user-service
+          relationship: cd
+      - interaction:
+          node: gacha-service
+          relationship: cd
+      - interaction:
+          node: market-tb
+          relationship: td
+    session-db:
+      type: micro.nodes.Datastore
+    user-db:
+      type: micro.nodes.Datastore
+    market-tb:
+      type: micro.nodes.Datastore
+    gacha-db:
+      type: micro.nodes.Datastore
+    static-service:
+      type: micro.nodes.Service
+    traefik(GATEWAY/LB/CB):
+      type: micro.nodes.MessageRouter
+      requirements:
+      - interaction: admin-service
+  groups:
+    Edge:
+      type: micro.groups.Edge
+      members:
+      - traefik (GATEWAY/LB/CB)
+  relationship_templates:
+    t:
+      type: micro.relationships.InteractsWith
+      properties:
+        timeout: true
+    c:
+      type: micro.relationships.InteractsWith
+      properties:
+        circuit_breaker: true
+    d:
+      type: micro.relationships.InteractsWith
+      properties:
+        dynamic_discovery: true
+    tc:
+      type: micro.relationships.InteractsWith
+      properties:
+        timeout: true
+        circuit_breaker: true
+    td:
+      type: micro.relationships.InteractsWith
+      properties:
+        timeout: true
+        dynamic_discovery: true
+    cd:
+      type: micro.relationships.InteractsWith
+      properties:
+        circuit_breaker: true
+        dynamic_discovery: true
+    tcd:
+      type: micro.relationships.InteractsWith
+      properties:
+        timeout: true
+        circuit_breaker: true
+        dynamic_discovery: true

@@ -1,0 +1,382 @@
+openapi: 3.0.0
+info:
+    title: Beetle Quest API - Admin MS API
+    version: 0.1.0
+
+servers:
+    - url: https://admin-service/api/v1
+
+tags:
+    - name: Admin
+
+paths:
+    /admin/user/get_all:
+        get:
+            summary: Get all users
+            tags: [Admin]
+            security:
+                - bearerAuth: []
+            responses:
+                200:
+                    description: All users obtained successfully.
+                500:
+                    description: Internal server error.
+
+    /admin/user/{user_id}:
+        get:
+            summary: Get user details
+            tags: [Admin]
+            security:
+                - bearerAuth: []
+            parameters:
+                - name: user_id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: User details obtained successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+        patch:
+            summary: Update user details
+            tags: [Admin]
+            security:
+                - bearerAuth: []
+            parameters:
+                - name: user_id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                description: Update user details
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/UpdateUser"
+            responses:
+                200:
+                    description: User details updated successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                409:
+                    description: Status conflict.
+                500:
+                    description: Internal server error.
+
+    /admin/user/{user_id}/transaction_history:
+        get:
+            summary: Get user transaction history
+            tags: [Admin]
+            security:
+                - bearerAuth: []
+            parameters:
+                - name: user_id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: User transaction history obtained successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /admin/user/{user_id}/auction/get_all:
+        get:
+            summary: Get user auction list
+            tags: [Admin]
+            security:
+                - bearerAuth: []
+            parameters:
+                - name: user_id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: User auction list obtained successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /admin/gacha/add:
+        post:
+            summary: Add gacha
+            tags: [Admin]
+            security:
+                - bearerAuth: []
+            requestBody:
+                description: Add gacha
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/AddGacha"
+            responses:
+                200:
+                    description: Gacha added successfully.
+                400:
+                    description: Status bad requests.
+                500:
+                    description: Internal server error.
+
+    /admin/gacha/get_all:
+        get:
+            summary: Get all gachas
+            tags: [Admin]
+            security:
+                - bearerAuth: []
+            responses:
+                200:
+                    description: All gachas obtained successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /admin/gacha/{gacha_id}:
+        get:
+            summary: Get gacha details
+            tags: [Admin]
+            security:
+                - bearerAuth: []
+            parameters:
+                - name: gacha_id
+                  in: path
+                  description: Gacha ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: Gacha details obtained successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+        patch:
+            summary: Update gacha details
+            tags: [Admin]
+            security:
+                - bearerAuth: []
+            parameters:
+                - name: gacha_id
+                  in: path
+                  description: Gacha ID
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                description: Update gacha
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/UpdateGacha"
+            responses:
+                200:
+                    description: Gacha details updated successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                409:
+                    description: Status conflict.
+                500:
+                    description: Internal server error.
+        delete:
+            summary: Delete gacha
+            tags: [Admin]
+            security:
+                - bearerAuth: []
+            parameters:
+                - name: gacha_id
+                  in: path
+                  description: Gacha ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: Gacha deleted successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /admin/market/transaction_history:
+        get:
+            summary: Get market's transaction history
+            tags: [Admin]
+            security:
+                - bearerAuth: []
+            responses:
+                200:
+                    description: Market history obtained successfully.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /admin/market/auction/get_all:
+        get:
+            summary: Get all auctions
+            tags: [Admin]
+            security:
+                - bearerAuth: []
+            responses:
+                200:
+                    description: All auctions obtained successfully.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /admin/market/auction/{auction_id}:
+        get:
+            summary: Get auction details
+            tags: [Admin]
+            security:
+                - bearerAuth: []
+            parameters:
+                - name: auction_id
+                  in: path
+                  description: Auction ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: Auction details obtained successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+        patch:
+            summary: Update auction details
+            tags: [Admin]
+            security:
+                - bearerAuth: []
+            parameters:
+                - name: auction_id
+                  in: path
+                  description: Auction ID
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                description: Update auction
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/UpdateAuction"
+            responses:
+                501:
+                    description: Not implemented yet
+
+    /internal/admin/find_by_id:
+        post:
+            summary: Find admin by ID
+            tags: [Users]
+            security:
+                - bearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/FindAdminByIdRequest"
+            responses:
+                200:
+                    description: Admin found.
+                404:
+                    description: Admin not found.
+                500:
+                    description: Internal server error.
+
+components:
+    securitySchemes:
+        bearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+
+    schemas:
+        UpdateUser:
+            type: object
+            properties:
+                username:
+                    type: string
+                email:
+                    type: string
+                currency:
+                    type: string
+
+        AddGacha:
+            type: object
+            properties:
+                name:
+                    type: string
+                rarity:
+                    type: string
+                price:
+                    type: string
+                image_path:
+                    type: string
+
+        UpdateGacha:
+            type: object
+            properties:
+                name:
+                    type: string
+                rarity:
+                    type: string
+                price:
+                    type: string
+                image_path:
+                    type: string
+
+        UpdateAuction:
+            type: object
+            properties:
+                gacha_id:
+                    type: string
+
+        FindAdminByIdRequest:
+            type: object
+            properties:
+                user_id:
+                    type: array
+                    items:
+                        type: integer

@@ -1,0 +1,417 @@
+openapi: 3.0.0
+info:
+    title: Beetle Quest API - Market MS API
+    version: 0.1.0
+
+servers:
+    - url: https://market-service/api/v1
+
+tags:
+    - name: Market
+
+paths:
+    /market/bugscoin/buy:
+        post:
+            summary: Buy bugscoin
+            tags: [Market]
+            security:
+                - bearerAuth: []
+            requestBody:
+                description: Buy bugscoin details
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/BuyBugscoin"
+            responses:
+                200:
+                    description: Bugscoin bought successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /market/gacha/roll:
+        get:
+            summary: Roll gacha
+            tags: [Market]
+            security:
+                - bearerAuth: []
+            responses:
+                200:
+                    description: Gacha rolled successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /market/gacha/{gacha_id}/buy:
+        get:
+            summary: Buy gacha
+            tags: [Market]
+            security:
+                - bearerAuth: []
+            parameters:
+                - name: gacha_id
+                  in: path
+                  description: Gacha ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: Gacha bought successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /market/auction:
+        post:
+            summary: Create auction
+            tags: [Market]
+            security:
+                - bearerAuth: []
+            requestBody:
+                description: Create auction details
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/CreateAuction"
+            responses:
+                200:
+                    description: Auction created successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                409:
+                    description: Status conflict.
+                500:
+                    description: Internal server error.
+
+    /market/auction/list:
+        get:
+            summary: Get auction list
+            tags: [Market]
+            security:
+                - bearerAuth: []
+            responses:
+                200:
+                    description: Auction list obtained successfully.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /market/auction/{auction_id}:
+        get:
+            summary: Get auction details
+            tags: [Market]
+            security:
+                - bearerAuth: []
+            parameters:
+                - name: auction_id
+                  in: path
+                  description: Auction ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: Auction deleted successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+        post:
+            summary: Delete auction
+            tags: [Market]
+            security:
+                - bearerAuth: []
+            parameters:
+                - name: auction_id
+                  in: path
+                  description: Auction ID
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                password:
+                                    type: string
+                                    description: The user's password
+
+            responses:
+                200:
+                    description: Auction deleted successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /market/auction/{auction_id}/bid:
+        post:
+            summary: Bid auction
+            tags: [Market]
+            security:
+                - bearerAuth: []
+            parameters:
+                - name: auction_id
+                  in: path
+                  description: Auction ID
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                description: Bid auction details
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/BidAuction"
+            responses:
+                200:
+                    description: Auction bid successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /internal/market/auction/find_by_id:
+        post:
+            summary: Find auction by ID
+            tags: [Market]
+            security:
+                - bearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/FindAuctionByIdRequest"
+            responses:
+                "200":
+                    description: Auction found.
+                "400":
+                    description: Bad Request
+                "404":
+                    description: Auction not found.
+                "500":
+                    description: Internal Server Error.
+
+    /internal/market/auction/update:
+        post:
+            summary: Update auction
+            tags: [Market]
+            security:
+                - bearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/UpdateAuctionRequest"
+            responses:
+                "200":
+                    description: Auction updated successfully.
+                "400":
+                    description: Bad Request
+                "404":
+                    description: Auction not found.
+                "500":
+                    description: Internal Server Error.
+
+    /internal/market/auction/get_all:
+        get:
+            summary: Get all auctions
+            tags: [Market]
+            responses:
+                "200":
+                    description: A list of auctions.
+                "404":
+                    description: Auctions not found.
+                "500":
+                    description: Internal Server Error.
+
+    /internal/market/auction/get_user_auctions:
+        post:
+            summary: Get auctions for a specific user
+            tags: [Market]
+            security:
+                - bearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/GetUserAuctionsRequest"
+            responses:
+                "200":
+                    description: User auctions retrieved successfully
+                "404":
+                    description: Auction not found.
+                "500":
+                    description: Internal Server Error.
+
+    /internal/market/get_transaction_history:
+        get:
+            summary: Get transaction history
+            tags: [Market]
+            security:
+                - bearerAuth: []
+            responses:
+                "200":
+                    description: Transaction history retrieved successfully.
+                "404":
+                    description: Transaction not found.
+                "500":
+                    description: Internal Server Error.
+
+    /internal/market/get_user_transaction_history:
+        post:
+            summary: Get transaction history for a specific user
+            tags: [Market]
+            security:
+                - bearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/GetUserTransactionHistoryRequest"
+            responses:
+                "200":
+                    description: User transaction history retrieved successfully.
+                "400":
+                    description: Bad Request
+                "404":
+                    description: Transaction not found.
+                "500":
+                    description: Internal Server Error.
+
+    /internal/market/delete_user_transaction_history:
+        post:
+            summary: Delete user transaction history
+            tags: [Market]
+            security:
+                - bearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/DeleteUserTransactionHistoryRequest"
+            responses:
+                "200":
+                    description: Transaction history deleted successfully
+                "400":
+                    description: Bad Request
+                "404":
+                    description: Transaction not found.
+                "500":
+                    description: Internal Server Error.
+
+components:
+    securitySchemes:
+        bearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+
+    schemas:
+        BuyBugscoin:
+            type: object
+            properties:
+                amount:
+                    type: string
+
+        CreateAuction:
+            type: object
+            properties:
+                gacha_id:
+                    type: string
+                end_time:
+                    type: string
+
+        BidAuction:
+            type: object
+            properties:
+                bid_amount:
+                    type: string
+
+        FindAuctionByIdRequest:
+            type: object
+            properties:
+                auction_id:
+                    type: array
+                    items:
+                        type: integer
+
+        UpdateAuctionRequest:
+            type: object
+            properties:
+                auction_id:
+                    type: array
+                    items:
+                        type: integer
+                owner_id:
+                    type: array
+                    items:
+                        type: integer
+                gacha_id:
+                    type: array
+                    items:
+                        type: integer
+                start_time:
+                    type: string
+                    format: date-time
+                end_time:
+                    type: string
+                    format: date-time
+                winner_id:
+                    type: array
+                    items:
+                        type: integer
+
+        GetUserAuctionsRequest:
+            type: object
+            properties:
+                user_id:
+                    type: array
+                    items:
+                        type: integer
+
+        GetUserTransactionHistoryRequest:
+            type: object
+            properties:
+                user_id:
+                    type: array
+                    items:
+                        type: integer
+
+        DeleteUserTransactionHistoryRequest:
+            type: object
+            properties:
+                user_id:
+                    type: array
+                    items:
+                        type: integer

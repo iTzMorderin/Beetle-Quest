@@ -1,0 +1,25 @@
+<div id="gacha-roll">
+    <button id="roll-btn" hx-get="/api/v1/market/gacha/roll" hx-target="#notification-popup" hx-target-4xx="#notification-popup" hx-target-5*="#notification-popup" hx-swap="innerHTML" hx-trigger="click">
+        Roll Gacha
+    </button>
+</div>
+<div class="auction-list">
+    {{range .Auctions}}
+    <div class="auction-item">
+        <div class="auction-info-img">
+            <div class="auction-info">
+                <h3>Auction ID: {{ .AuctionID }}</h3>
+                <p>Owner: {{ .OwnerUsername }}</p>
+                <p>Gacha: {{ .GachaName }}</p>
+                <p>Start Time: {{.StartTime.Format "Jan 2, 2006 15:04 MST"}}</p>
+                <p>End Time: {{.EndTime.Format "Jan 2, 2006 15:04 MST"}}</p>
+                <p>Winner ID: {{ .WinnerID }}</p>
+            </div>
+            <img src="{{ .ImagePath }}" alt="{{ .GachaName }}" class="auction-image" />
+        </div>
+        <div>
+            <button hx-get="/api/v1/market/auction/{{ .AuctionID }}" hx-target="#app-content" hx-target-4xx="#notification-popup" hx-target-5*="#notification-popup" hx-swap="innerHTML" hx-trigger="click">View Details</button>
+        </div>
+    </div>
+    {{end}}
+</div>

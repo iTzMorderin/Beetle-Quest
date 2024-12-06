@@ -1,0 +1,62 @@
+tls:
+    stores:
+        default:
+            defaultCertificate:
+                certFile: /certs/cert.pem
+                keyFile: /certs/key.pem
+    certificates:
+        - certFile: /certs/client_internal_cert.pem
+          keyFile: /certs/client_internal_key.pem
+          stores:
+              - default
+http:
+    serversTransports:
+        insecureTransport:
+            serverName: "admin-reverse-proxy"
+            # clientAuthType: RequireAndVerifyClientCert
+            certificates: # These are set as client certificates on mTLS
+                - certFile: /certs/client_internal_cert.pem
+                  keyFile: /certs/client_internal_key.pem
+            rootCAs: # Root CAs to use when verifying server certificates.
+                - /certs/cacert.pem
+
+    middlewares:
+        traefik-auth:
+            forwardAuth:
+                address: "https://auth-service/api/v1/auth/traefik/verify"
+                tls:
+                    ca: /certs/cacert.pem
+                    cert: /certs/client_internal_cert.pem
+                    key: /certs/client_internal_key.pem
+
+    routers:
+        admin-service:
+            rule: "PathPrefix(`/api/v1/admin`)"
+            entryPoints:
+                - websec
+            service: admin-service
+            priority: 1
+            tls: true
+            middlewares:
+                - "traefik-auth"
+
+        auth-service:
+            rule: "(PathPrefix(`/api/v1/auth`) || PathPrefix(`/oauth`))"
+            entryPoints:
+                - websec
+            service: auth-service
+            priority: 1
+            tls: true
+
+    services:
+        admin-service:
+            loadBalancer:
+                serversTransport: insecureTransport
+                servers:
+                    - url: "https://admin-service"
+
+        auth-service:
+            loadBalancer:
+                serversTransport: insecureTransport
+                servers:
+                    - url: "https://auth-service"

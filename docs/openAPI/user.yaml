@@ -1,0 +1,268 @@
+openapi: 3.0.0
+info:
+    title: Beetle Quest API - User MS API
+    version: 0.1.0
+
+servers:
+    - url: https://user-service/api/v1
+
+tags:
+    - name: Users
+
+paths:
+    /userinfo:
+        get:
+            servers:
+                - url: https://user-service
+            summary: Get user info
+            tags: [Users]
+            security:
+                - bearerAuth: []
+            responses:
+                200:
+                    description: ""
+                    content:
+                        application/pdf:
+                            schema:
+                                type: object
+                                properties:
+                                    sub:
+                                        type: string
+                                    username:
+                                        type: string
+                                    email:
+                                        type: string
+                                    currency:
+                                        type: integer
+                404:
+                    description: ""
+
+    /user/account/{user_id}:
+        get:
+            summary: Get user account
+            tags: [Users]
+            security:
+                - bearerAuth: []
+            parameters:
+                - name: user_id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: User account details.
+                400:
+                    description: Status bad requests.
+                500:
+                    description: Internal server error.
+        patch:
+            summary: Modify user account
+            tags: [Users]
+            security:
+                - bearerAuth: []
+            parameters:
+                - name: user_id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                description: User account details
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/PatchUser"
+            responses:
+                200:
+                    description: User account modified successfully.
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+        post:
+            summary: Delete user account
+            tags: [Users]
+            security:
+                - bearerAuth: []
+            parameters:
+                - name: user_id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                password:
+                                    type: string
+                                    description: The user's password
+            responses:
+                303:
+                    description: Status see other (redirect to login).
+                400:
+                    description: Status bad requests.
+                404:
+                    description: Status not found.
+                500:
+                    description: Internal server error.
+
+    /internal/user/find_by_username:
+        post:
+            summary: Find user by username
+            tags: [Users]
+            security:
+                - bearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/FindUserByUsernameRequest"
+            responses:
+                "200":
+                    description: User found.
+                "404":
+                    description: User not found.
+
+    /internal/user/get_all:
+        get:
+            summary: Get all users
+            tags: [Users]
+            security:
+                - bearerAuth: []
+            responses:
+                "200":
+                    description: A list of users
+
+    /internal/user/find_by_id:
+        post:
+            summary: Find user by ID
+            tags: [Users]
+            security:
+                - bearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/FindUserByIdRequest"
+            responses:
+                "200":
+                    description: User found.
+
+    /internal/user/create:
+        post:
+            summary: Create new user
+            tags: [Users]
+            security:
+                - bearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/CreateUserRequest"
+            responses:
+                "200":
+                    description: User created successfully.
+
+    /internal/user/update:
+        post:
+            summary: Update user
+            tags: [Users]
+            security:
+                - bearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/UpdateUserRequest"
+            responses:
+                200:
+                    description: User found.
+                404:
+                    description: User not found.
+                500:
+                    description: Internal server error.
+
+components:
+    securitySchemes:
+        bearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+
+    schemas:
+        PatchUser:
+            type: object
+            properties:
+                username:
+                    type: string
+                email:
+                    type: string
+                new_password:
+                    type: string
+                old_password:
+                    type: string
+
+        FindUserByUsernameRequest:
+            type: object
+            properties:
+                username:
+                    type: string
+
+        FindUserByIdRequest:
+            type: object
+            properties:
+                user_id:
+                    type: array
+                    items:
+                        type: integer
+
+        CreateUserRequest:
+            type: object
+            properties:
+                user_id:
+                    type: array
+                    items:
+                        type: integer
+                username:
+                    type: string
+                email:
+                    type: string
+                currency:
+                    type: integer
+                password_hash:
+                    type: array
+                    items:
+                        type: integer
+
+        UpdateUserRequest:
+            type: object
+            properties:
+                user_id:
+                    type: array
+                    items:
+                        type: integer
+                username:
+                    type: string
+                email:
+                    type: string
+                currency:
+                    type: integer
+                password_hash:
+                    type: array
+                    items:
+                        type: integer
